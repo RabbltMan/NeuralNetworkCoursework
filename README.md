@@ -5,7 +5,7 @@ This is a repo for Neural Network coursework
 ## Tasks
 
 - [ ] Facial recognition
-- [ ] Indoor wireless signal positioning
+- [ ] Indoor localization based on wireless signals
 
 ## Future To-dos
 
