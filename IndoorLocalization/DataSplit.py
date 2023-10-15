@@ -14,7 +14,3 @@ class DataSplit(object):
 
     def __call__(self, test_size=0.25) -> List[ndarray]:
         return train_test_split(self.__X, self.__y, test_size=test_size)
-
-
-if __name__ == "__main__":
-    DataSplit()()
