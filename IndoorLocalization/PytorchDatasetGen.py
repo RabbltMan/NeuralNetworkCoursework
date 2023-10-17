@@ -12,7 +12,7 @@ class PytorchDatasetGen(Dataset):
                  device: Literal["cuda", "cpu"] = "cpu") -> None:
         self.__len = X.shape[0]
         self.X = from_numpy(X).to(device)
-        self.y = from_numpy(y).to(device)
+        self.y = from_numpy(y).add(-1).squeeze().long().to(device)
 
     def __getitem__(self, index: int) -> Tuple[Tensor, Tensor]:
         return self.X[index], self.y[index]

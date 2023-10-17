@@ -4,10 +4,11 @@ Dataset contains 2000 samples for indoor localization using wireless signals wit
 
 **Project Completion**
 
-![Progress](https://progress-bar.dev/60/?title=Progress&width=430&color=9d8de5)
+![Progress](https://progress-bar.dev/95/?title=Progress&width=430&color=9d8de5)
 ## Task Description 
 
 - [x] Data split
 - [x] Design an appropriate neural network structure
 - [x] Train and evaluate
-- [ ] Fine-tune the neural network's parameters and hyper-parameters
+- [x] Fine-tune the neural network's parameters and hyper-parameters
+- [ ] Visualize network structure and performance 
