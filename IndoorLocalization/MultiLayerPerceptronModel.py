@@ -65,7 +65,7 @@ class MultiLayerPerceptronModel(object):
                     val_y_pred = self.model(val_X)
                     valLoss = self.lossFunc(val_y_pred, val_y)
                     runningValLoss += valLoss
-            avgValLoss = runningValLoss / (len(self.valSet) / 4)
+            avgValLoss = runningValLoss / len(self.valLoader)
             print(f" >>> loss={avgTrainLoss:.4f}, val_loss={avgValLoss:.4f}",
                   end='\r')
 
@@ -94,7 +94,7 @@ class MultiLayerPerceptronModel(object):
             # Adjust learning weights
             self.optimizer.step()
 
-        return runningLoss / (len(self.trainSet) / self.BATCHSIZE)
+        return runningLoss / len(self.trainLoader)
 
     def evaluate(self):
         savedState = load("./IndoorLocalization/MLP_checkpoint.pt", mmap=True)
@@ -110,7 +110,7 @@ class MultiLayerPerceptronModel(object):
                 test_y_pred = self.model(test_X)
                 testLoss = self.lossFunc(test_y_pred, test_y)
                 runningTestLoss += testLoss
-        avgTestLoss = runningTestLoss / (len(self.testSet))
+        avgTestLoss = runningTestLoss / len(self.testLoader)
         f1Score = f1_score(test_y.cpu(),
                            argmax(test_y_pred.cpu(), dim=1),
                            average="macro")
@@ -119,6 +119,3 @@ class MultiLayerPerceptronModel(object):
         print(f"\n\nPerformance: \ntest_loss: {avgTestLoss:.4f}")
         print(f"F1 Score: {f1Score}")
         print(f"Confusion Matrix: \n{confMat}")
-
-
-MultiLayerPerceptronModel()
