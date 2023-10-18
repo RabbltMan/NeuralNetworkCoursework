@@ -15,5 +15,6 @@ class SupportVectorMachineModel(object):
         y_pred = self.predictor.predict(self.X_test)
         self.f1Score = f1_score(y_true=self.y_test, y_pred=y_pred, average="macro")
         self.confusionMat = confusion_matrix(y_true=self.y_test, y_pred=y_pred)
-        print(f"\nF1 Score: {self.f1Score}")
-        print(f"Confusion Matrix: \n{self.confusionMat}")
+        print("="*30, "\nPerformance:")
+        print(f"F1 Score: {self.f1Score}")
+        print(f"Confusion Matrix: \n{self.confusionMat}\n")

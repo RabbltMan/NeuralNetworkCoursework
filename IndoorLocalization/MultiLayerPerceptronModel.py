@@ -13,7 +13,11 @@ from PytorchDatasetGen import *
 
 class MultiLayerPerceptronModel(object):
 
-    def __init__(self, BATCH_SIZE: int = 64, LR: float = 0.01) -> None:
+    def __init__(
+        self,
+        BATCH_SIZE: int = 64,
+        LR: float = 0.01,
+    ) -> None:
         self.BATCHSIZE = BATCH_SIZE
         self.LR = LR
         if cuda.is_available():
@@ -29,8 +33,8 @@ class MultiLayerPerceptronModel(object):
         self.testLoader = DataLoader(self.testSet,
                                      batch_size=len(self.testSet),
                                      shuffle=True)
-        print(f"Model on device: {self.__device}\n{self.model}\n")
-        self.train(150)
+        print(f"\nModel on device: {self.__device}\n{self.model}\n")
+        self.train(60)
         self.evaluate()
 
     def train(self, EPOCHS: int = 1):
@@ -56,9 +60,9 @@ class MultiLayerPerceptronModel(object):
                                             shuffle=True)
             self.model.train(True)
             avgTrainLoss = self.__trainEpoch(currEpoch)
+            self.model.eval()
             # Validation
             runningValLoss = 0.0
-            self.model.eval()
             with no_grad():
                 for valData in self.valLoader:
                     val_X, val_y = valData
@@ -97,7 +101,7 @@ class MultiLayerPerceptronModel(object):
         return runningLoss / len(self.trainLoader)
 
     def evaluate(self):
-        savedState = load("./IndoorLocalization/MLP_checkpoint.pt", mmap=True)
+        savedState = load("./IndoorLocalization/MLP_checkpoint.pt")
         net = MultiLayerPerceptronModule(self.__device)
         net.load_state_dict(savedState, assign=True)
         runningTestLoss = 0.0
@@ -116,6 +120,6 @@ class MultiLayerPerceptronModel(object):
                            average="macro")
         confMat = confusion_matrix(test_y.cpu(),
                                    argmax(test_y_pred.cpu(), dim=1))
-        print(f"\n\nPerformance: \ntest_loss: {avgTestLoss:.4f}")
+        print(f"\n{'='*30}\nPerformance: \ntest_loss: {avgTestLoss:.4f}")
         print(f"F1 Score: {f1Score}")
         print(f"Confusion Matrix: \n{confMat}")
