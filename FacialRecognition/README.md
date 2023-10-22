@@ -10,7 +10,7 @@ The task of face recognition can be divided into `2 stages`: **detection** and *
 
 **Project Completion**
 
-![Progress](https://progress-bar.dev/70/?title=Progress&width=430&color=66cdaa)
+![Progress](https://progress-bar.dev/95/?title=Progress&width=430&color=66cdaa)
 
 ## Task Description 
 - [x] **Neural Network Architecture Determination**
@@ -21,6 +21,6 @@ The task of face recognition can be divided into `2 stages`: **detection** and *
   - [x] Data split
   - [x] Train and evaluation
   - [x] Fine-tune the params and hyper-params
-  - [ ] Monitor and visualise metrics
-- [ ] **Comparative Analysis of Experimental Results with Different Models**
-  - [ ] Implement at least 1 different model
+  - [ ] Monitor and visualize metrics
+- [x] **Comparative Analysis of Experimental Results with Different Models**
+  - [x] Implement at least 1 different model

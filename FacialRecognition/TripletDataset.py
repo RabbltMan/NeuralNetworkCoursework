@@ -15,8 +15,8 @@ class TripletDataset(Dataset):
                  size: int = 500) -> None:
         self.pos = []
         self.neg = [
-            from_numpy(array(Image.open(f"{negPath}{f}"))).permute(
-                2, 0, 1).float() / 255.0
+            from_numpy(array(Image.open(f"{negPath}{f}").resize(
+                (160, 160)))).permute(2, 0, 1).float() / 255.0
             for f in choices(listdir(negPath), k=max(size, 500))
         ]
         for d in posPathList:
@@ -33,17 +33,21 @@ class TripletDataset(Dataset):
             negClass: List[List[Tensor]] = choice(
                 [self.neg] +
                 [self.pos[c] for c in range(len(self.pos)) if c != posClass])
+            A: Tensor = choice(self.pos[posClass])
+            P: Tensor = choice(self.pos[posClass])
+            N: Tensor = choice(negClass)
+            y: Tensor = from_numpy(array([posClass])).squeeze().long()
             if cuda.is_available():
-                return choice(self.pos[posClass]).cuda(), choice(
-                    self.pos[posClass]).cuda(), choice(negClass).cuda()
-            return choice(self.pos[posClass]).cpu(), choice(
-                self.pos[posClass]).cpu(), choice(negClass).cpu()
+                return A.cuda(), P.cuda(), N.cuda(), y.cuda()
+            return A.cpu(), P.cpu(), N.cpu(), y.cpu()
         else:
+            A: Tensor = choice(self.pos[0])
+            P: Tensor = choice(self.pos[0])
+            N: Tensor = choice(self.neg)
+            y: Tensor = from_numpy(array([0])).squeeze().long()
             if cuda.is_available():
-                return choice(self.pos[0]).cuda(), choice(
-                    self.pos[0]).cuda(), choice(self.neg).cuda()
-            return choice(self.pos[0]).cpu(), choice(
-                self.pos[0]).cpu(), choice(self.neg).cpu()
+                return A.cuda(), P.cuda(), N.cuda(), y.cuda()
+            return A.cpu(), P.cpu(), N.cpu(), y.cpu()
 
     def __len__(self):
         return self.__len
