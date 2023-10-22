@@ -8,7 +8,7 @@ class InceptionResnetV1Module(Module):
 
     def __init__(
         self,
-        classNum: int = len(listdir("./FacialRecognition/.faces/")) - 2
+        classNum: int = len(listdir("./FacialRecognition/.faces/")) - 1
     ) -> None:
         super().__init__()
         self.conv2d_1a = Conv2dStack(3, 32, 3, 2)

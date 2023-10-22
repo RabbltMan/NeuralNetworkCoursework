@@ -1,4 +1,6 @@
 **/.vscode/
 **/__pycache__/
 **/*.pt
+**/*.pth
 **/.faces/**/
+**/losses.txt

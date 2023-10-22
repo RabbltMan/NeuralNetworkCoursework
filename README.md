@@ -4,10 +4,10 @@ This is a repo for Neural Network coursework
 
 ## Tasks
 
-- [ ] Face recognition
+- [x] Face recognition
 - [x] Indoor localization based on wireless signals
 
-## Future To-dos
+## ~~Future To-dos~~
 
-- [ ] Continuous Hopfield Neural Network TSP problem optimization
+- [ ] ~~Continuous Hopfield Neural Network TSP problem optimization~~
  

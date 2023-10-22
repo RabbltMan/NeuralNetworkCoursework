@@ -6,15 +6,15 @@ from random import random, choice
 
 class RegisterFace(object):
 
-    def __init__(self, sample: int = 50, augmentNum: int = 20) -> None:
+    def __init__(self, sample: int = 30, augmentNum: int = 30) -> None:
         self.augmentNum = augmentNum
         self.sample = sample
-        self.haarCascadePath = "./FacialRecognition/.faces/haarcascade_frontalface_alt2.xml"
+        self.haarCascadePath = "./FacialRecognition/.faces/z_haarcascade_frontalface_alt2.xml"
         self.captureFaceFromCamera()
 
     def captureFaceFromCamera(self) -> None:
-        regNum = len(os.listdir("./FacialRecognition/.faces/")) - 1
-        self.path = f"./FacialRecognition/.faces/{regNum}/"
+        self.regNum = len(os.listdir("./FacialRecognition/.faces/")) - 1
+        self.path = f"./FacialRecognition/.faces/{self.regNum}/"
         os.mkdir(f"{self.path}")
         i = 0
         capture = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -41,7 +41,7 @@ class RegisterFace(object):
                         self.randAugment(img, i, aug)
                         aug += 1
                     i += 1
-            cv2.imshow(f"Register New Face#{regNum}", frame)
+            cv2.imshow(f"Register New Face#{self.regNum}", frame)
             # press Q to quit
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 if not len(os.listdir(self.path)):
@@ -49,19 +49,21 @@ class RegisterFace(object):
                 break
         cv2.destroyAllWindows()
 
-    def randAugment(self, img, i, j):
+    def randAugment(self, img: Image.Image, i, j):
         enhancement = 0
-        while (enhancement < 3 and (random()**enhancement) > 0.5):
-            factor = 1.5 * random() + 0.35
+        if (random() > 0.5):
+            img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        while (enhancement < 3 and (random() > 0.5 or enhancement == 0)):
+            factor = 0.5 * random() + 0.75
             enhancer = choice([
                 ImageEnhance.Brightness(img),
                 ImageEnhance.Contrast(img),
                 ImageEnhance.Color(img),
-                ImageEnhance.Sharpness(img)
+                ImageEnhance.Sharpness(img),
             ])
             img = enhancer.enhance(factor)
             enhancement += 1
-            img.save(f"{self.path}{i}_{j}.png")
+        img.save(f"{self.path}{self.regNum}_{i}_{j}.png")
 
 
 RegisterFace()
