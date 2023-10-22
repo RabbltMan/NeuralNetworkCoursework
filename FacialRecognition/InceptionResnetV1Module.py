@@ -8,7 +8,7 @@ class InceptionResnetV1Module(Module):
 
     def __init__(
         self,
-        classNum: int = len(listdir("./FacialRecognition/.faces/")) - 1
+        classNum: int = len(listdir("./FacialRecognition/.faces/")) - 2
     ) -> None:
         super().__init__()
         self.conv2d_1a = Conv2dStack(3, 32, 3, 2)
@@ -49,7 +49,6 @@ class InceptionResnetV1Module(Module):
         else:
             self.cpu()
             print(f"Model on device: cpu")
-        print(self)
 
     def forward(self, X: Tensor) -> Tensor:
         X = self.conv2d_1a(X)
@@ -105,10 +104,10 @@ class Block35(Module):
         self.scale = scale
         self.branch_0 = Conv2dStack(256, 32, 1, 1)
         self.branch_1 = Sequential(Conv2dStack(256, 32, 1, 1),
-                                   Conv2dStack(32, 32, 3, 1))
+                                   Conv2dStack(32, 32, 3, 1, 1))
         self.branch_2 = Sequential(Conv2dStack(256, 32, 1, 1),
-                                   Conv2dStack(32, 32, 3, 1),
-                                   Conv2dStack(32, 32, 3, 1))
+                                   Conv2dStack(32, 32, 3, 1, 1),
+                                   Conv2dStack(32, 32, 3, 1, 1))
         self.conv2d = Conv2d(96, 256, 1)
         self.relu = ReLU()
 
@@ -208,6 +207,3 @@ class Mixed_7a(Module):
         X_3 = self.branch_3(X)
         y = cat((X_0, X_1, X_2, X_3), 1)
         return y
-
-
-InceptionResnetV1Module()

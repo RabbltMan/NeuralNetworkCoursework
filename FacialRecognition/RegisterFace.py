@@ -6,7 +6,7 @@ from random import random, choice
 
 class RegisterFace(object):
 
-    def __init__(self, sample: int = 20, augmentNum: int = 50) -> None:
+    def __init__(self, sample: int = 50, augmentNum: int = 20) -> None:
         self.augmentNum = augmentNum
         self.sample = sample
         self.haarCascadePath = "./FacialRecognition/.faces/haarcascade_frontalface_alt2.xml"
@@ -52,7 +52,7 @@ class RegisterFace(object):
     def randAugment(self, img, i, j):
         enhancement = 0
         while (enhancement < 3 and (random()**enhancement) > 0.5):
-            factor = 1.5 * random() + 0.65
+            factor = 1.5 * random() + 0.35
             enhancer = choice([
                 ImageEnhance.Brightness(img),
                 ImageEnhance.Contrast(img),
