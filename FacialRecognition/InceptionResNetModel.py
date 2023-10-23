@@ -9,20 +9,19 @@ from TripletDataset import *
 
 class InceptionResNetModel(object):
 
-    def __init__(self, lr: float = 0.0002, BATCH_SIZE: int = 5) -> None:
+    def __init__(self, lr: float = 0.00002, BATCH_SIZE: int = 6) -> None:
         self.BATCH_SIZE = BATCH_SIZE
+        self.lr = lr
         self.model = InceptionResnetV1Module()
-        self.lossFunc1 = TripletMarginLoss()
-        self.lossFunc2 = CrossEntropyLoss()
-        self.optimizer = Adam(self.model.parameters(), lr)
-        self.negPath = "./FacialRecognition/.faces/utkfaces/"
         self.posRootPath = "./FacialRecognition/.faces/"
         self.posPathList = [
-            self.posRootPath + d for d in listdir(self.posRootPath)[:-2]
+            self.posRootPath + d for d in listdir(self.posRootPath)[:-1]
         ]
-        self.train()
 
-    def train(self, EPOCH: int = 15, loadPretrained=True):
+    def train(self, EPOCH: int = 3, loadPretrained=True):
+        self.lossFunc1 = TripletMarginLoss()
+        self.lossFunc2 = CrossEntropyLoss()
+        self.optimizer = Adam(self.model.parameters(), self.lr)
         bestValLoss = 1_000_000_007
         if loadPretrained and path.exists(
                 "./FacialRecognition/InceptionV1.pth"):
@@ -38,51 +37,40 @@ class InceptionResNetModel(object):
             # TripletDataLoader itself returns (A, P, N) randomly picked and packed from those faces.
             # There should be P(P(500, 2), 500) different tuples in theory. So val and test shares the same DataLoader.
             # However, this may still cause overfitting with pre-loaded faces.
-            # So train and test(val) will be updated every 5 epochs.
-            if not epoch % 5:
-                self.trainTripletDataset = TripletDataset(
-                    self.posPathList, self.negPath, 750)
-                self.trainTripletDataLoader = DataLoader(
-                    self.trainTripletDataset, self.BATCH_SIZE)
-                self.testTripletDataset = TripletDataset(
-                    self.posPathList, self.negPath, 399)
-                self.testTripletDataLoader = DataLoader(
-                    self.testTripletDataset, 7)
-                trainLen = len(self.trainTripletDataLoader)
+            # So train set will be updated every epoch.
+            self.trainDataset = TripletDataset(self.posPathList, 800)
+            self.trainDataLoader = DataLoader(self.trainDataset,
+                                              self.BATCH_SIZE)
+            trainLen = len(self.trainDataLoader)
             runningLoss = 0
             self.model.train()
-            for i, (A, P, N, y) in enumerate(self.trainTripletDataLoader):
-                print(
-                    f"\rEpoch {epoch+1}/{EPOCH}: {(i+1)/trainLen * 100:>6.2f}%",
-                    end='')
-                yA = self.model(A)
-                yP = self.model(P)
-                yN = self.model(N)
-                self.optimizer.zero_grad()
-                loss = self.lossFunc1(yA, yP, yN) + self.lossFunc2(yA, y)
-                loss.backward()
-                runningLoss += loss.item()
-                self.optimizer.step()
-            avgTrainLoss = runningLoss / trainLen
-            self.model.eval()
-            runningValLoss = 0
-            with no_grad():
-                for (valA, valP, valN, y) in self.testTripletDataLoader:
-                    yValA = self.model(valA)
-                    yValP = self.model(valP)
-                    yValN = self.model(valN)
-                    runningValLoss += self.lossFunc1(yValA, yValP, yValN)
-                    runningValLoss += self.lossFunc2(yValA, y)
-            avgValLoss = runningValLoss / len(self.testTripletDataLoader)
-            print(f" >>> loss={avgTrainLoss:.4f}, val_loss={avgValLoss:.4f}",
-                  end='\r')
             with open("./FacialRecognition/losses.txt", "a") as file:
-                file.write(f"{avgTrainLoss},{avgValLoss}\n")
-            if avgValLoss < bestValLoss:
-                bestValLoss = avgValLoss
+                for i, (A, P, N, y, yn) in enumerate(self.trainDataLoader):
+                    yA = self.model(A)
+                    yP = self.model(P)
+                    yN = self.model(N)
+                    self.optimizer.zero_grad()
+                    loss = self.lossFunc1(yA, yP, yN)
+                    loss += self.lossFunc2(yA, y)
+                    loss += self.lossFunc2(yP, y)
+                    loss += 2 * self.lossFunc2(yN, yn)
+                    loss.backward()
+                    runningLoss += loss.item()
+                    print(
+                        f"\rEpoch {epoch+1}/{EPOCH}: {(i+1)/trainLen * 100:>6.2f}% >>> loss={runningLoss/(i+1):.4f}",
+                        end='')
+                    self.optimizer.step()
+                    file.write(f"{runningLoss/(i+1)}\n")
+            avgTrainLoss = runningLoss / trainLen
+            with open("./FacialRecognition/losses.txt", "a") as file:
+                file.write(f"{avgTrainLoss}\n")
+            if avgTrainLoss < bestValLoss:
+                bestValLoss = avgTrainLoss
                 save(self.model.state_dict(),
                      f="./FacialRecognition/InceptionV1.pth")
         print()
 
 
-InceptionResNetModel()
+if __name__ == "__main__":
+    newModel = InceptionResNetModel()
+    newModel.train()

@@ -4,3 +4,5 @@
 **/*.pth
 **/.faces/**/
 **/losses.txt
+**/users.json
+**/stranger.yaml
